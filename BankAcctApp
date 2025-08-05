@@ -1,0 +1,35 @@
+package courseproject;
+
+import java.util.ArrayList;
+
+public class BankAcctApp {
+    public static void main(String[] args) {
+        ArrayList<Customer> customers = new ArrayList<>();
+        String addMore = "y";
+
+        while (addMore.equalsIgnoreCase("y")) {
+            Customer c = new Customer();
+
+            c.setCustomerID(DataEntry.getStringWithLimit("Enter Customer ID (max 5): ", 5));
+            c.setSSN(DataEntry.getNumericString("Enter SSN (9 digits): ", 9));
+            c.setLastName(DataEntry.getStringWithLimit("Enter Last Name (max 20): ", 20));
+            c.setFirstName(DataEntry.getStringWithLimit("Enter First Name (max 15): ", 15));
+            c.setStreet(DataEntry.getStringWithLimit("Enter Street (max 20): ", 20));
+            c.setCity(DataEntry.getStringWithLimit("Enter City (max 20): ", 20));
+            c.setState(DataEntry.getStringWithLimit("Enter State (2 letters): ", 2));
+            c.setZip(DataEntry.getNumericString("Enter Zip (5 digits): ", 5));
+            c.setPhone(DataEntry.getNumericString("Enter Phone (10 digits, no dashes): ", 10));
+
+            customers.add(c);
+
+            addMore = DataEntry.getString("Add another customer? (y/n): ");
+        }
+
+        System.out.println("\n--- Customer List ---");
+        System.out.println("ID\tSSN\tName\tAddress\tCity/State/Zip\tPhone");
+
+        for (Customer c : customers) {
+            System.out.println(c.toString());
+        }
+    }
+}
