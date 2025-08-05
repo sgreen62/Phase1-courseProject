@@ -1,0 +1,38 @@
+package courseproject;
+
+public class Customer {
+    private String customerID;
+    private String ssn;
+    private String lastName;
+    private String firstName;
+    private String street;
+    private String city;
+    private String state;
+    private String zip;
+    private String phone;
+
+    public void setCustomerID(String id) { this.customerID = id; }
+    public void setSSN(String ssn) { this.ssn = ssn; }
+    public void setLastName(String name) { this.lastName = name; }
+    public void setFirstName(String name) { this.firstName = name; }
+    public void setStreet(String street) { this.street = street; }
+    public void setCity(String city) { this.city = city; }
+    public void setState(String state) { this.state = state; }
+    public void setZip(String zip) { this.zip = zip; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public String getCustomerID() { return customerID; }
+    public String getSSN() { return ssn; }
+    public String getLastName() { return lastName; }
+    public String getFirstName() { return firstName; }
+    public String getStreet() { return street; }
+    public String getCity() { return city; }
+    public String getState() { return state; }
+    public String getZip() { return zip; }
+    public String getPhone() { return phone; }
+
+    public String toString() {
+        return customerID + "\t" + ssn + "\t" + lastName + ", " + firstName + "\t" +
+               street + "\t" + city + ", " + state + " " + zip + "\tPhone: " + phone;
+    }
+}
