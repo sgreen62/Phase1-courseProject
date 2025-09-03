@@ -1,257 +1,181 @@
-package courseProject;
+package courseproject;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class BankAcctApp {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
 
-        // Create two customers (Phase 2 requirement)
-        for (int i = 1; i <= 2; i++) {
-            System.out.println("\n--- Enter details for Customer " + i + " ---");
-
-            Customer customer = new Customer();
-            Account account = new Account();
-
-            boolean valid;
-
-            // Customer ID
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter Customer ID (max 5): ");
-                    String id = scanner.nextLine();
-                    if (id.isBlank() || id.length() > 5) {
-                        throw new IllegalArgumentException("Customer ID must be 1–5 characters.");
-                    }
-                    customer.setCustomerID(id);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // Customer SSN
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter SSN (9 digits): ");
-                    String ssn = scanner.nextLine();
-                    if (ssn.length() != 9 || !ssn.matches("\\d+")) {
-                        throw new IllegalArgumentException("SSN must be 9 numeric digits.");
-                    }
-                    customer.setSSN(ssn);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // Last Name
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter Last Name (max 20): ");
-                    String last = scanner.nextLine();
-                    if (last.isBlank() || last.length() > 20) {
-                        throw new IllegalArgumentException("Last name must be 1–20 characters.");
-                    }
-                    customer.setLastName(last);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // First Name
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter First Name (max 15): ");
-                    String first = scanner.nextLine();
-                    if (first.isBlank() || first.length() > 15) {
-                        throw new IllegalArgumentException("First name must be 1–15 characters.");
-                    }
-                    customer.setFirstName(first);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // Street
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter Street (max 20): ");
-                    String street = scanner.nextLine();
-                    if (street.isBlank() || street.length() > 20) {
-                        throw new IllegalArgumentException("Street must be 1–20 characters.");
-                    }
-                    customer.setStreet(street);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // City
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter City (max 20): ");
-                    String city = scanner.nextLine();
-                    if (city.isBlank() || city.length() > 20) {
-                        throw new IllegalArgumentException("City must be 1–20 characters.");
-                    }
-                    customer.setCity(city);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // State
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter State (2 characters): ");
-                    String state = scanner.nextLine();
-                    if (state.isBlank() || state.length() != 2) {
-                        throw new IllegalArgumentException("State must be exactly 2 characters.");
-                    }
-                    customer.setState(state.toUpperCase());
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // Zip
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter Zip (5 digits): ");
-                    String zip = scanner.nextLine();
-                    if (zip.length() != 5 || !zip.matches("\\d+")) {
-                        throw new IllegalArgumentException("Zip must be 5 numeric digits.");
-                    }
-                    customer.setZip(zip);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // Phone
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter Phone (10 digits, no punctuation): ");
-                    String phone = scanner.nextLine();
-                    if (phone.length() != 10 || !phone.matches("\\d+")) {
-                        throw new IllegalArgumentException("Phone must be 10 numeric digits.");
-                    }
-                    customer.setPhone(phone);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // ---------------------------
-            // Now collect Account details
-            // ---------------------------
-            System.out.println("\n--- Enter Account Details ---");
-
-            // Account Number
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter account number (max 5): ");
-                    String acctNum = scanner.nextLine();
-                    if (acctNum.isBlank() || acctNum.length() > 5) {
-                        throw new IllegalArgumentException("Account number must be 1–5 characters.");
-                    }
-                    account.setAccountNumber(acctNum);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // Account Type
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter account type (CHK or SAV): ");
-                    String acctType = scanner.nextLine().toUpperCase();
-                    if (!(acctType.equals("CHK") || acctType.equals("SAV"))) {
-                        throw new IllegalArgumentException("Type must be CHK or SAV.");
-                    }
-                    account.setAccountType(acctType);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // Service Fee
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter service fee (0.00 - 10.00): ");
-                    double fee = Double.parseDouble(scanner.nextLine());
-                    if (fee < 0 || fee > 10) {
-                        throw new IllegalArgumentException("Service fee must be between 0 and 10.");
-                    }
-                    account.setServiceFee(fee);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // Interest Rate
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter interest rate (0.0 - 10.0): ");
-                    double rate = Double.parseDouble(scanner.nextLine());
-                    if (rate < 0 || rate > 10) {
-                        throw new IllegalArgumentException("Interest rate must be between 0 and 10.");
-                    }
-                    account.setInterestRate(rate);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // Overdraft Fee
-            valid = false;
-            while (!valid) {
-                try {
-                    System.out.print("Enter overdraft fee: ");
-                    double overdraft = Double.parseDouble(scanner.nextLine());
-                    if (overdraft < 0) {
-                        throw new IllegalArgumentException("Overdraft fee must be non-negative.");
-                    }
-                    account.setOverdraftFee(overdraft);
-                    valid = true;
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
-
-            // ---------------------------
-            // Print Customer + Account
-            // ---------------------------
-            System.out.println("\nCustomer and Account Info:");
-            System.out.println(customer.toString());
-            System.out.println(account.toString());
+    private static String readString(Scanner in, String prompt, int maxLen) {
+        while (true) {
+            try {
+                System.out.print(prompt);
+                String v = in.nextLine().trim();
+                if (v.isEmpty() || v.length() > maxLen) throw new IllegalArgumentException("length 1-" + maxLen);
+                return v;
+            } catch (Exception e) { System.out.println("invalid: " + e.getMessage()); }
         }
+    }
 
-        scanner.close();
+    private static String readDigits(Scanner in, String prompt, int len) {
+        while (true) {
+            try {
+                System.out.print(prompt);
+                String v = in.nextLine().trim();
+                if (v.length() != len || !v.matches("\\d+")) throw new IllegalArgumentException("must be " + len + " digits");
+                return v;
+            } catch (Exception e) { System.out.println("invalid: " + e.getMessage()); }
+        }
+    }
+
+    private static LocalDate readDate(Scanner in, String prompt) {
+        while (true) {
+            try {
+                System.out.print(prompt + " (yyyy-MM-dd): ");
+                String v = in.nextLine().trim();
+                return LocalDate.parse(v);
+            } catch (DateTimeParseException e) {
+                System.out.println("invalid: enter date like 2025-09-03");
+            }
+        }
+    }
+
+    private static String readType(Scanner in, String prompt) {
+        while (true) {
+            try {
+                System.out.print(prompt + " (DEP or WTH): ");
+                String v = in.nextLine().trim().toUpperCase();
+                if (!v.equals("DEP") && !v.equals("WTH")) throw new IllegalArgumentException("DEP or WTH");
+                return v;
+            } catch (Exception e) { System.out.println("invalid: " + e.getMessage()); }
+        }
+    }
+
+    private static double readAmount(Scanner in, String prompt) {
+        while (true) {
+            try {
+                System.out.print(prompt + " (> 0): ");
+                double v = Double.parseDouble(in.nextLine().trim());
+                if (v <= 0) throw new IllegalArgumentException("must be > 0");
+                return v;
+            } catch (NumberFormatException e) {
+                System.out.println("invalid number");
+            } catch (Exception e) {
+                System.out.println("invalid: " + e.getMessage());
+            }
+        }
+    }
+
+    private static void printHeader() {
+        System.out.println("\nID\tAcct#\tType\tDate\t\tTxType\tAmount\tFee/Note\tBalance");
+    }
+
+    private static void printLine(String id, Account acct, LocalDate d, String txType, double amt, String note) {
+        System.out.printf("%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%.2f%n",
+                id,
+                acct.getAccountNumber(),
+                acct.getAccountType(),
+                d == null ? "-" : d.toString(),
+                txType == null ? "-" : txType,
+                amt,
+                note == null ? "-" : note,
+                acct.balance());
+    }
+
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+
+        // ----- create Customer 1 (checking) -----
+        Customer c1 = new Customer();
+        c1.setCustomerID(readString(in, "Customer1 ID (max 5): ", 5));
+        c1.setSSN(readDigits(in, "SSN (9 digits): ", 9));
+        c1.setLastName(readString(in, "Last Name (max 20): ", 20));
+        c1.setFirstName(readString(in, "First Name (max 15): ", 15));
+        c1.setStreet(readString(in, "Street (max 20): ", 20));
+        c1.setCity(readString(in, "City (max 20): ", 20));
+        c1.setState(readString(in, "State (2 letters): ", 2).toUpperCase());
+        c1.setZip(readDigits(in, "Zip (5 digits): ", 5));
+        c1.setPhone(readDigits(in, "Phone (10 digits): ", 10));
+
+        CheckingAccount chk = new CheckingAccount();
+        chk.setAccountNumber(readString(in, "Checking Acct# (max 5): ", 5));
+        // start balance is zero by design
+
+        // ----- create Customer 2 (savings) -----
+        System.out.println();
+        Customer c2 = new Customer();
+        c2.setCustomerID(readString(in, "Customer2 ID (max 5): ", 5));
+        c2.setSSN(readDigits(in, "SSN (9 digits): ", 9));
+        c2.setLastName(readString(in, "Last Name (max 20): ", 20));
+        c2.setFirstName(readString(in, "First Name (max 15): ", 15));
+        c2.setStreet(readString(in, "Street (max 20): ", 20));
+        c2.setCity(readString(in, "City (max 20): ", 20));
+        c2.setState(readString(in, "State (2 letters): ", 2).toUpperCase());
+        c2.setZip(readDigits(in, "Zip (5 digits): ", 5));
+        c2.setPhone(readDigits(in, "Phone (10 digits): ", 10));
+
+        SavingsAccount sav = new SavingsAccount();
+        sav.setAccountNumber(readString(in, "Savings Acct# (max 5): ", 5));
+
+        // ----- scenario steps -----
+        printHeader();
+
+        // 1) Deposit $1000 into checking
+        LocalDate d1 = readDate(in, "Date for checking deposit 1000");
+        chk.setTransaction(d1, "DEP", 1000);
+        chk.deposit();
+        printLine(c1.getCustomerID(), chk, d1, "DEP", 1000, "fee 0.50");
+
+        // 2) Withdraw $500 from checking
+        LocalDate d2 = readDate(in, "Date for checking withdraw 500");
+        chk.setTransaction(d2, "WTH", 500);
+        chk.withdrawal();
+        printLine(c1.getCustomerID(), chk, d2, "WTH", 500, "fee 0.50 or +30 if overdraft");
+
+        // 3) Withdraw $501 from checking
+        LocalDate d3 = readDate(in, "Date for checking withdraw 501");
+        chk.setTransaction(d3, "WTH", 501);
+        chk.withdrawal();
+        printLine(c1.getCustomerID(), chk, d3, "WTH", 501, "fee 0.50 (+30 if <0)");
+
+        // 4) Deposit $500 into checking
+        LocalDate d4 = readDate(in, "Date for checking deposit 500");
+        chk.setTransaction(d4, "DEP", 500);
+        chk.deposit();
+        printLine(c1.getCustomerID(), chk, d4, "DEP", 500, "fee 0.50");
+
+        // 5) Add interest to checking (2%)
+        chk.applyInterest();
+        printLine(c1.getCustomerID(), chk, null, "INT", 0, "add 2%");
+
+        // 6) Deposit $1000 into savings
+        LocalDate d6 = readDate(in, "Date for savings deposit 1000");
+        sav.setTransaction(d6, "DEP", 1000);
+        sav.deposit();
+        printLine(c2.getCustomerID(), sav, d6, "DEP", 1000, "fee 0.25");
+
+        // 7) Withdraw $500 from savings
+        LocalDate d7 = readDate(in, "Date for savings withdraw 500");
+        sav.setTransaction(d7, "WTH", 500);
+        sav.withdrawal();
+        printLine(c2.getCustomerID(), sav, d7, "WTH", 500, "fee 0.25 or denied");
+
+        // 8) Withdraw $501 from savings
+        LocalDate d8 = readDate(in, "Date for savings withdraw 501");
+        sav.setTransaction(d8, "WTH", 501);
+        sav.withdrawal();
+        printLine(c2.getCustomerID(), sav, d8, "WTH", 501, "fee 0.25 or denied");
+
+        // 9) Deposit $500 into savings
+        LocalDate d9 = readDate(in, "Date for savings deposit 500");
+        sav.setTransaction(d9, "DEP", 500);
+        sav.deposit();
+        printLine(c2.getCustomerID(), sav, d9, "DEP", 500, "fee 0.25");
+
+        // 10) Add interest to savings (5%)
+        sav.applyInterest();
+        printLine(c2.getCustomerID(), sav, null, "INT", 0, "add 5%");
+
+        in.close();
     }
 }
