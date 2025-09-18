@@ -3,209 +3,296 @@ package courseproject;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BankGuiApp extends JFrame {
-    // storage
+
+    // simple in-memory storage keyed by Customer ID
     private final Map<String, Customer> customers = new HashMap<>();
     private final Map<String, Account> accounts = new HashMap<>();
 
     // customer fields
-    private final JTextField tfCustId = new JTextField("C1001", 10);
-    private final JTextField tfFirst = new JTextField("Shawn", 10);
-    private final JTextField tfLast = new JTextField("Green", 10);
-    private final JTextField tfStreet = new JTextField("123 Main St", 12);
-    private final JTextField tfCity = new JTextField("Philly", 10);
-    private final JComboBox<String> cbState = new JComboBox<>(new String[]{"PA","NJ","NY","DE","MD","VA"});
-    private final JTextField tfZip = new JTextField("19103", 6);
-    private final JTextField tfPhone = new JTextField("2155551234", 12);
-    private final JTextField tfSSN = new JTextField("123456789", 12);
+    private final JTextField tfCustId = new JTextField(8);
+    private final JTextField tfFirst  = new JTextField(10);
+    private final JTextField tfLast   = new JTextField(12);
+    private final JTextField tfStreet = new JTextField(12);
+    private final JTextField tfCity   = new JTextField(10);
+    private final JComboBox<String> cbState = new JComboBox<>(new String[]{"NY","NJ","PA","MD","VA"});
+    private final JTextField tfZip    = new JTextField(5);
+    private final JTextField tfPhone  = new JTextField(10);
 
-    // account type
+    // account fields
+    private final JTextField tfAcctNo = new JTextField(6);
     private final JRadioButton rbChecking = new JRadioButton("Checking", true);
-    private final JRadioButton rbSavings = new JRadioButton("Savings");
+    private final JRadioButton rbSavings  = new JRadioButton("Savings");
 
-    // opening deposit
-    private final JTextField tfOpenAmt = new JTextField("500.00", 8);
+    // transaction controls
+    private final JTextField tfTxDate   = new JTextField(10); // yyyy-MM-dd
+    private final JTextField tfTxAmount = new JTextField(8);
+    private final JRadioButton rbDep = new JRadioButton("Deposit", true);
+    private final JRadioButton rbWth = new JRadioButton("Withdraw");
+    private final JRadioButton rbInt = new JRadioButton("Add Interest");
 
-    // transaction
-    private final JComboBox<String> cbTxn = new JComboBox<>(new String[]{"Deposit","Withdraw","Add Interest"});
-    private final JTextField tfAmt = new JTextField("100.00", 8);
-
-    // output
-    private final JLabel lblStatus = new JLabel("status...");
-    private final JTextArea taResult = new JTextArea(6, 50);
+    // output labels
+    private final JLabel lblStatus = new JLabel(" ");
+    private final JLabel lblResult = new JLabel(" ");
 
     public BankGuiApp() {
-        super("Bank GUI (Phase 4)");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout(8,8));
+        super("Course Project - GUI");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout(10,10));
+        ((JComponent)getContentPane()).setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
-        // top: customer + account panel
-        JPanel top = new JPanel(new GridBagLayout());
+        // ========== top forms ==========
+        JPanel form = new JPanel(new GridBagLayout());
         GridBagConstraints g = new GridBagConstraints();
         g.insets = new Insets(4,4,4,4);
-        g.fill = GridBagConstraints.HORIZONTAL;
+        g.anchor = GridBagConstraints.WEST;
 
+        // customer panel
+        JPanel pCust = new JPanel(new GridBagLayout());
+        pCust.setBorder(BorderFactory.createTitledBorder("Customer"));
         int r = 0;
-        addRow(top, g, r++, new JLabel("Customer ID:"), tfCustId, new JLabel("First:"), tfFirst, new JLabel("Last:"), tfLast);
-        addRow(top, g, r++, new JLabel("Street:"), tfStreet, new JLabel("City:"), tfCity, new JLabel("State:"), cbState);
-        addRow(top, g, r++, new JLabel("ZIP:"), tfZip, new JLabel("Phone:"), tfPhone, new JLabel("SSN:"), tfSSN);
+        addRow(pCust, r++, "Customer ID:", tfCustId);
+        addRow(pCust, r++, "First Name:",  tfFirst);
+        addRow(pCust, r++, "Last Name:",   tfLast);
+        addRow(pCust, r++, "Street:",      tfStreet);
+        addRow(pCust, r++, "City:",        tfCity);
+        addRow(pCust, r++, "State:",       cbState);
+        addRow(pCust, r++, "Zip (5 digits):",   tfZip);
+        addRow(pCust, r++, "Phone (10 digits):", tfPhone);
 
-        ButtonGroup grp = new ButtonGroup();
-        grp.add(rbChecking); grp.add(rbSavings);
-        JPanel acctType = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
-        acctType.add(new JLabel("Account:"));
-        acctType.add(rbChecking);
-        acctType.add(rbSavings);
-        acctType.add(new JLabel("Opening Deposit:"));
-        acctType.add(tfOpenAmt);
+        // account panel
+        JPanel pAcct = new JPanel(new GridBagLayout());
+        pAcct.setBorder(BorderFactory.createTitledBorder("Account"));
+        ButtonGroup bgType = new ButtonGroup();
+        bgType.add(rbChecking);
+        bgType.add(rbSavings);
+        JPanel typeRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        typeRow.add(rbChecking);
+        typeRow.add(rbSavings);
 
-        g.gridx = 0; g.gridy = r++; g.gridwidth = 6;
-        top.add(acctType, g);
+        int ar = 0;
+        addRow(pAcct, ar++, "Account # (max 5):", tfAcctNo);
+        addRow(pAcct, ar++, "Account Type:",      typeRow);
 
-        add(top, BorderLayout.NORTH);
+        // transaction panel
+        JPanel pTx = new JPanel(new GridBagLayout());
+        pTx.setBorder(BorderFactory.createTitledBorder("Transaction"));
+        ButtonGroup bgTx = new ButtonGroup();
+        bgTx.add(rbDep); bgTx.add(rbWth); bgTx.add(rbInt);
+        JPanel txTypeRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        txTypeRow.add(rbDep); txTypeRow.add(rbWth); txTypeRow.add(rbInt);
 
-        // center: transaction panel
-        JPanel mid = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
-        mid.add(new JLabel("Transaction:"));
-        mid.add(cbTxn);
-        mid.add(new JLabel("Amount:"));
-        mid.add(tfAmt);
+        int tr = 0;
+        addRow(pTx, tr++, "Date (yyyy-MM-dd):", tfTxDate);
+        addRow(pTx, tr++, "Amount (>0):",       tfTxAmount);
+        addRow(pTx, tr++, "Transaction Type:",  txTypeRow);
 
-        JButton btnAdd = new JButton("Add New Customer and Account");
-        JButton btnShow = new JButton("Display Customer and Account Data");
-        JButton btnDo = new JButton("Perform Transaction");
-        JButton btnClear = new JButton("Clear");
+        // place sections
+        g.gridx = 0; g.gridy = 0; form.add(pCust, g);
+        g.gridx = 1; g.gridy = 0; form.add(pAcct, g);
+        g.gridx = 0; g.gridy = 1; g.gridwidth = 2; form.add(pTx, g);
+        add(form, BorderLayout.CENTER);
 
-        mid.add(btnAdd);
-        mid.add(btnShow);
-        mid.add(btnDo);
-        mid.add(btnClear);
-        add(mid, BorderLayout.CENTER);
+        // ========== buttons ==========
+        JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        JButton btnAdd      = new JButton("Add New Customer and Account");
+        JButton btnDisplay  = new JButton("Display Customer and Account Data");
+        JButton btnTransact = new JButton("Perform Transaction");
+        JButton btnClear    = new JButton("Clear");
+        pBtns.add(btnAdd); pBtns.add(btnDisplay); pBtns.add(btnTransact); pBtns.add(btnClear);
+        add(pBtns, BorderLayout.NORTH);
 
-        // bottom: status + result
-        JPanel bottom = new JPanel(new BorderLayout(6,6));
-        lblStatus.setForeground(new Color(30, 90, 30));
-        bottom.add(lblStatus, BorderLayout.NORTH);
-        taResult.setEditable(false);
-        taResult.setLineWrap(true);
-        taResult.setWrapStyleWord(true);
-        bottom.add(new JScrollPane(taResult), BorderLayout.CENTER);
-        add(bottom, BorderLayout.SOUTH);
+        // ========== status + result ==========
+        JPanel pBottom = new JPanel(new GridLayout(2,1,6,6));
+        lblStatus.setForeground(new Color(20,90,20));
+        pBottom.add(wrap("Status: ", lblStatus));
+        pBottom.add(wrap("Result: ", lblResult));
+        add(pBottom, BorderLayout.SOUTH);
 
         // actions
         btnAdd.addActionListener(this::onAdd);
-        btnShow.addActionListener(this::onShow);
-        btnDo.addActionListener(this::onDo);
-        btnClear.addActionListener(e -> clearFields());
+        btnDisplay.addActionListener(this::onDisplay);
+        btnTransact.addActionListener(this::onTransact);
+        btnClear.addActionListener(e -> clearAll());
 
-        pack();
+        setSize(900, 520);
         setLocationRelativeTo(null);
     }
 
-    private void addRow(JPanel p, GridBagConstraints g, int row, Component... comps) {
-        int col = 0;
-        for (Component c : comps) {
-            g.gridx = col++; g.gridy = row; g.gridwidth = 1;
-            p.add(c, g);
+    // ===== actions =====
+    private void onAdd(ActionEvent e) {
+        try {
+            String id    = mustLen(tfCustId.getText(), 1, 5,  "Customer ID");
+            String first = mustLen(tfFirst.getText(),  1, 15, "First Name");
+            String last  = mustLen(tfLast.getText(),   1, 20, "Last Name");
+            String street= mustLen(tfStreet.getText(), 1, 20, "Street");
+            String city  = mustLen(tfCity.getText(),   1, 20, "City");
+            String state = (String) cbState.getSelectedItem();
+            String zip   = mustDigits(tfZip.getText(),   5, "Zip");
+            String phone = mustDigits(tfPhone.getText(), 10, "Phone");
+            String acctNo= mustLen(tfAcctNo.getText(), 1, 5, "Account #");
+
+            Customer c = new Customer();
+            c.setCustomerID(id); c.setFirstName(first); c.setLastName(last);
+            c.setStreet(street); c.setCity(city); c.setState(state);
+            c.setZip(zip); c.setPhone(phone);
+
+            Account acct = rbChecking.isSelected() ? new CheckingAccount() : new SavingsAccount();
+            acct.setAccountNumber(acctNo);
+
+            customers.put(id, c);
+            accounts.put(id, acct);
+
+            setStatus("saved customer/account for ID " + id, true);
+            lblResult.setText(" ");
+        } catch (IllegalArgumentException ex) {
+            setStatus(ex.getMessage(), false);
         }
     }
 
-    private void onAdd(ActionEvent e) {
+    private void onDisplay(ActionEvent e) {
         String id = tfCustId.getText().trim();
-        if (id.isEmpty()) { setStatus("Enter Customer ID."); return; }
-
-        Customer c = new Customer();
-        c.setCustomerID(id);
-        c.setFirstName(tfFirst.getText().trim());
-        c.setLastName(tfLast.getText().trim());
-        c.setStreet(tfStreet.getText().trim());
-        c.setCity(tfCity.getText().trim());
-        c.setState(cbState.getSelectedItem().toString());
-        c.setZip(tfZip.getText().trim());
-        c.setPhone(tfPhone.getText().trim());
-        c.setSsn(tfSSN.getText().trim());
-
-        Account acc = rbChecking.isSelected() ? new CheckingAccount() : new SavingsAccount();
-
-        // optional opening deposit
-        double open = parseAmt(tfOpenAmt.getText());
-        if (open > 0) acc.deposit(open);
-
-        customers.put(id, c);
-        accounts.put(id, acc);
-
-        taResult.setText("Created " + id + " => " + acc.getAccountNumber() + " (" + acc.getAccountType() + ")\n"
-                + "Opening deposit: $" + String.format("%.2f", Math.max(0, open)) + " | Note: " + acc.getLastNote()
-                + "\nBalance: $" + String.format("%.2f", acc.balance()));
-        setStatus("Customer and account added.");
-    }
-
-    private void onShow(ActionEvent e) {
-        String id = tfCustId.getText().trim();
-        Customer c = customers.get(id);
-        Account a = accounts.get(id);
-        if (c == null || a == null) { setStatus("Not found. Add customer first."); return; }
-        taResult.setText(
-            "Customer: " + c + "\n" +
-            "Account#: " + a.getAccountNumber() + " | Type: " + a.getAccountType() + "\n" +
-            "Balance: $" + String.format("%.2f", a.balance())
-        );
-        setStatus("Shown.");
-    }
-
-    private void onDo(ActionEvent e) {
-        String id = tfCustId.getText().trim();
-        Account a = accounts.get(id);
-        if (a == null) { setStatus("No account for that Customer ID."); return; }
-
-        String action = cbTxn.getSelectedItem().toString();
-        if ("Add Interest".equals(action)) {
-            a.addInterest();
-            taResult.append("\n\nTX: ADD_INTEREST | Note: " + a.getLastNote()
-                    + "\nNew Balance: $" + String.format("%.2f", a.balance()));
-            setStatus(a.wasLastSuccess() ? "Interest applied." : "Interest skipped.");
+        if (!customers.containsKey(id)) {
+            setStatus("no customer for ID " + id, false);
             return;
         }
+        Customer c = customers.get(id);
+        Account a = accounts.get(id);
+        setStatus("displaying " + id, true);
+        lblResult.setText(String.format(
+            "ID=%s  Acct#=%s  Type=%s  Balance=%.2f  Name=%s %s  City=%s  State=%s",
+            id, a.getAccountNumber(), a.getAccountType(), a.balance(),
+            c.getFirstName(), c.getLastName(), c.getCity(), c.getState()
+        ));
+    }
 
-        double amt = parseAmt(tfAmt.getText());
-        if (amt <= 0) { setStatus("Enter amount > 0"); return; }
+    private void onTransact(ActionEvent e) {
+        try {
+            String id = mustLen(tfCustId.getText(), 1, 5, "Customer ID");
+            if (!customers.containsKey(id) || !accounts.containsKey(id)) {
+                throw new IllegalArgumentException("customer/account not found for ID " + id);
+            }
+            Account acct = accounts.get(id);
 
-        if ("Deposit".equals(action)) {
-            a.deposit(amt);
-        } else { // Withdraw
-            a.withdrawal(amt);
+            LocalDate date;
+            try {
+                date = LocalDate.parse(tfTxDate.getText().trim());
+            } catch (DateTimeParseException ex) {
+                throw new IllegalArgumentException("enter date like yyyy-MM-dd");
+            }
+
+            if (rbInt.isSelected()) {
+                if (acct instanceof CheckingAccount) {
+                    ((CheckingAccount) acct).applyInterest();
+                    lblResult.setText(formatLine(id, acct, date, "INT", 0.0, "add 2%"));
+                } else {
+                    ((SavingsAccount) acct).applyInterest();
+                    lblResult.setText(formatLine(id, acct, date, "INT", 0.0, "add 5%"));
+                }
+                setStatus("interest added", true);
+                return;
+            }
+
+            double amt = parsePositive(tfTxAmount.getText().trim(), "Amount");
+            String txType = rbDep.isSelected() ? "DEP" : "WTH";
+            String note;
+
+            if (acct instanceof CheckingAccount) {
+                CheckingAccount ca = (CheckingAccount) acct;
+                ca.setTransaction(date, txType, amt);
+                if ("DEP".equals(txType)) {
+                    ca.deposit(); note = "fee 0.50";
+                } else {
+                    double preview = ca.balance() - amt - ca.getServiceFee();
+                    boolean overdraft = preview < 0;
+                    ca.withdrawal();
+                    note = overdraft ? "fee 0.50 + overdraft 30.00" : "fee 0.50";
+                }
+                lblResult.setText(formatLine(id, acct, date, txType, amt, note));
+                setStatus("transaction complete", true);
+
+            } else { // SavingsAccount
+                SavingsAccount sa = (SavingsAccount) acct;
+                sa.setTransaction(date, txType, amt);
+                if ("DEP".equals(txType)) {
+                    sa.deposit(); note = "fee 0.25";
+                } else {
+                    double before = sa.balance();
+                    sa.withdrawal();
+                    note = (sa.balance() == before) ? "denied" : "fee 0.25";
+                }
+                lblResult.setText(formatLine(id, acct, date, txType, amt, note));
+                setStatus("transaction processed", true);
+            }
+
+        } catch (IllegalArgumentException ex) {
+            setStatus(ex.getMessage(), false);
         }
-
-        taResult.append("\n\nTX: " + action.toUpperCase() + " $" + String.format("%.2f", amt)
-                + " | Note: " + a.getLastNote()
-                + "\nNew Balance: $" + String.format("%.2f", a.balance()));
-        setStatus(a.wasLastSuccess() ? "Transaction ok." : "Transaction denied.");
     }
 
-    private void clearFields() {
-        tfCustId.setText("");
-        tfFirst.setText("");
-        tfLast.setText("");
-        tfStreet.setText("");
-        tfCity.setText("");
+    private void clearAll() {
+        for (JTextField tf : new JTextField[]{tfCustId, tfFirst, tfLast, tfStreet, tfCity, tfZip, tfPhone, tfAcctNo, tfTxDate, tfTxAmount}) {
+            tf.setText("");
+        }
+        rbChecking.setSelected(true);
+        rbDep.setSelected(true);
         cbState.setSelectedIndex(0);
-        tfZip.setText("");
-        tfPhone.setText("");
-        tfSSN.setText("");
-        tfOpenAmt.setText("0.00");
-        tfAmt.setText("0.00");
-        taResult.setText("");
-        setStatus("Cleared.");
+        lblStatus.setText(" ");
+        lblResult.setText(" ");
+        tfCustId.requestFocus();
     }
 
-    private double parseAmt(String s) {
-        try { return Double.parseDouble(s.trim()); } catch (Exception ex) { return 0; }
+    // ===== helpers =====
+    private static void addRow(JPanel p, int row, String label, Component field) {
+        GridBagConstraints g = new GridBagConstraints();
+        g.insets = new Insets(4,4,4,4);
+        g.anchor = GridBagConstraints.WEST;
+        g.gridx = 0; g.gridy = row; p.add(new JLabel(label), g);
+        g.gridx = 1; g.gridy = row; p.add(field, g);
     }
 
-    private void setStatus(String s) { lblStatus.setText(s); }
+    private static JPanel wrap(String prefix, JComponent comp) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        panel.add(new JLabel(prefix));
+        panel.add(comp);
+        return panel;
+    }
+
+    private static String mustLen(String s, int min, int max, String name) {
+        String v = s == null ? "" : s.trim();
+        if (v.length() < min || v.length() > max) throw new IllegalArgumentException(name + " length " + min + "-" + max);
+        return v;
+    }
+
+    private static String mustDigits(String s, int len, String name) {
+        String v = s == null ? "" : s.trim();
+        if (v.length() != len || !v.matches("\\d+")) throw new IllegalArgumentException(name + " must be " + len + " digits");
+        return v;
+    }
+
+    private static double parsePositive(String s, String name) {
+        try {
+            double v = Double.parseDouble(s);
+            if (v <= 0) throw new NumberFormatException();
+            return v;
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException(name + " must be > 0");
+        }
+    }
+
+    private static String formatLine(String id, Account acct, LocalDate d, String txType, double amt, String note) {
+        return String.format(
+            "ID=%s  Acct#=%s  Type=%s  Date=%s  Tx=%s  Amount=%.2f  Note=%s  Balance=%.2f",
+            id, acct.getAccountNumber(), acct.getAccountType(),
+            d == null ? "-" : d.toString(),
+            txType, amt, note, acct.balance()
+        );
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new BankGuiApp().setVisible(true));
