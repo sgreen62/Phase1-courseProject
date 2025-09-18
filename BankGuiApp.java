@@ -10,9 +10,9 @@ import java.util.Map;
 
 public class BankGuiApp extends JFrame {
 
-    // simple in-memory storage keyed by Customer ID
+    // simple in-memory store keyed by customer ID
     private final Map<String, Customer> customers = new HashMap<>();
-    private final Map<String, Account> accounts = new HashMap<>();
+    private final Map<String, Account>  accounts  = new HashMap<>();
 
     // customer fields
     private final JTextField tfCustId = new JTextField(8);
@@ -36,7 +36,7 @@ public class BankGuiApp extends JFrame {
     private final JRadioButton rbWth = new JRadioButton("Withdraw");
     private final JRadioButton rbInt = new JRadioButton("Add Interest");
 
-    // output labels
+    // output
     private final JLabel lblStatus = new JLabel(" ");
     private final JLabel lblResult = new JLabel(" ");
 
@@ -46,7 +46,7 @@ public class BankGuiApp extends JFrame {
         setLayout(new BorderLayout(10,10));
         ((JComponent)getContentPane()).setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
-        // ========== top forms ==========
+        // form
         JPanel form = new JPanel(new GridBagLayout());
         GridBagConstraints g = new GridBagConstraints();
         g.insets = new Insets(4,4,4,4);
@@ -92,13 +92,13 @@ public class BankGuiApp extends JFrame {
         addRow(pTx, tr++, "Amount (>0):",       tfTxAmount);
         addRow(pTx, tr++, "Transaction Type:",  txTypeRow);
 
-        // place sections
+        // layout sections
         g.gridx = 0; g.gridy = 0; form.add(pCust, g);
         g.gridx = 1; g.gridy = 0; form.add(pAcct, g);
         g.gridx = 0; g.gridy = 1; g.gridwidth = 2; form.add(pTx, g);
         add(form, BorderLayout.CENTER);
 
-        // ========== buttons ==========
+        // buttons
         JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         JButton btnAdd      = new JButton("Add New Customer and Account");
         JButton btnDisplay  = new JButton("Display Customer and Account Data");
@@ -107,7 +107,7 @@ public class BankGuiApp extends JFrame {
         pBtns.add(btnAdd); pBtns.add(btnDisplay); pBtns.add(btnTransact); pBtns.add(btnClear);
         add(pBtns, BorderLayout.NORTH);
 
-        // ========== status + result ==========
+        // bottom labels
         JPanel pBottom = new JPanel(new GridLayout(2,1,6,6));
         lblStatus.setForeground(new Color(20,90,20));
         pBottom.add(wrap("Status: ", lblStatus));
@@ -138,9 +138,14 @@ public class BankGuiApp extends JFrame {
             String acctNo= mustLen(tfAcctNo.getText(), 1, 5, "Account #");
 
             Customer c = new Customer();
-            c.setCustomerID(id); c.setFirstName(first); c.setLastName(last);
-            c.setStreet(street); c.setCity(city); c.setState(state);
-            c.setZip(zip); c.setPhone(phone);
+            c.setCustomerID(id);
+            c.setFirstName(first);
+            c.setLastName(last);
+            c.setStreet(street);
+            c.setCity(city);
+            c.setState(state);
+            c.setZip(zip);
+            c.setPhone(phone);
 
             Account acct = rbChecking.isSelected() ? new CheckingAccount() : new SavingsAccount();
             acct.setAccountNumber(acctNo);
@@ -179,6 +184,7 @@ public class BankGuiApp extends JFrame {
             }
             Account acct = accounts.get(id);
 
+            // date
             LocalDate date;
             try {
                 date = LocalDate.parse(tfTxDate.getText().trim());
@@ -186,6 +192,7 @@ public class BankGuiApp extends JFrame {
                 throw new IllegalArgumentException("enter date like yyyy-MM-dd");
             }
 
+            // interest path
             if (rbInt.isSelected()) {
                 if (acct instanceof CheckingAccount) {
                     ((CheckingAccount) acct).applyInterest();
@@ -198,14 +205,15 @@ public class BankGuiApp extends JFrame {
                 return;
             }
 
-            double amt = parsePositive(tfTxAmount.getText().trim(), "Amount");
-            String txType = rbDep.isSelected() ? "DEP" : "WTH";
+            // deposit/withdraw path
+            double amt  = parsePositive(tfTxAmount.getText().trim(), "Amount");
+            String type = rbDep.isSelected() ? "DEP" : "WTH";
             String note;
 
             if (acct instanceof CheckingAccount) {
                 CheckingAccount ca = (CheckingAccount) acct;
-                ca.setTransaction(date, txType, amt);
-                if ("DEP".equals(txType)) {
+                ca.setTransaction(date, type, amt);
+                if ("DEP".equals(type)) {
                     ca.deposit(); note = "fee 0.50";
                 } else {
                     double preview = ca.balance() - amt - ca.getServiceFee();
@@ -213,20 +221,20 @@ public class BankGuiApp extends JFrame {
                     ca.withdrawal();
                     note = overdraft ? "fee 0.50 + overdraft 30.00" : "fee 0.50";
                 }
-                lblResult.setText(formatLine(id, acct, date, txType, amt, note));
+                lblResult.setText(formatLine(id, acct, date, type, amt, note));
                 setStatus("transaction complete", true);
 
             } else { // SavingsAccount
                 SavingsAccount sa = (SavingsAccount) acct;
-                sa.setTransaction(date, txType, amt);
-                if ("DEP".equals(txType)) {
+                sa.setTransaction(date, type, amt);
+                if ("DEP".equals(type)) {
                     sa.deposit(); note = "fee 0.25";
                 } else {
                     double before = sa.balance();
                     sa.withdrawal();
                     note = (sa.balance() == before) ? "denied" : "fee 0.25";
                 }
-                lblResult.setText(formatLine(id, acct, date, txType, amt, note));
+                lblResult.setText(formatLine(id, acct, date, type, amt, note));
                 setStatus("transaction processed", true);
             }
 
